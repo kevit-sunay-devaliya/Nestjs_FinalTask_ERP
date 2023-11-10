@@ -1,8 +1,8 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 import { AttendanceDto } from './dtos/attendance.dto';
-import { AuthGuard } from 'src/guards/Auth.guard';
-import { StaffAuthorizationGuard } from 'src/guards/Authorization.guard';
+import { AuthGuard } from '../guards/Auth.guard';
+import { StaffAuthorizationGuard } from '../guards/Authorization.guard';
 
 @Controller('attendance')
 export class AttendanceController {

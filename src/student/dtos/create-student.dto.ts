@@ -1,4 +1,11 @@
-import { IsEmail, IsNumber, IsPhoneNumber, IsString } from 'class-validator';
+import {
+  IsEmail,
+  IsMongoId,
+  IsNumber,
+  IsPhoneNumber,
+  IsString,
+} from 'class-validator';
+// import { Types } from 'mongoose';
 
 export class CreateStudentDto {
   @IsString()
@@ -21,4 +28,8 @@ export class CreateStudentDto {
 
   @IsNumber()
   batchYear: number;
+
+  @IsMongoId()
+  // departmentId: Types.ObjectId;
+  departmentId: string;
 }

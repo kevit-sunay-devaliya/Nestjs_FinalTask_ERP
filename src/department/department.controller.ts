@@ -12,7 +12,7 @@ import { DepartmentService } from './department.service';
 import { CreateDepartmentDto } from './dtos/create-department.dto';
 import { UpdateDepartmentDto } from './dtos/update-department.dto';
 import { AuthGuard } from '../guards/Auth.guard';
-import { AdminAuthorizationGuard } from 'src/guards/Authorization.guard';
+import { AdminAuthorizationGuard } from '../guards/Authorization.guard';
 
 @Controller('department')
 @UseGuards(AuthGuard, AdminAuthorizationGuard)

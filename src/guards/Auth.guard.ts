@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { StudentService } from 'src/student/student.service';
-import { config } from 'src/config';
+import { StudentService } from '../student/student.service';
+// import { config } from 'src/config';
 import { FacultyService } from '../faculty/faculty.service';
 
 @Injectable()
@@ -35,9 +35,9 @@ export class AuthGuard implements CanActivate {
     //     join(__dirname, '../../../keys/Private.key'),
     //   );
     try {
-      const private_key = config.private_key;
+      // const private_key = config.private_key;
       const payload = await this.jwtService.verifyAsync(token, {
-        secret: private_key,
+        secret: process.env.PRIVATE_KEY,
       });
 
       const user =
@@ -48,7 +48,7 @@ export class AuthGuard implements CanActivate {
       if (!user.authToken) {
         throw new UnauthorizedException('Please Login!');
       }
-      // request['user'] = student;
+      request['user'] = user;
       // request.role = payload.role;
       request.id = payload._id;
       // return student.authToken;

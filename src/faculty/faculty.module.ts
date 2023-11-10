@@ -5,8 +5,8 @@ import { JwtService } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { FacultySchema } from './faculty.schema';
 import { Faculty } from './faculty.schema';
-import { Student, StudentSchema } from 'src/student/student.schema';
-import { StudentService } from 'src/student/student.service';
+import { Student, StudentSchema } from '../student/student.schema';
+import { StudentService } from '../student/student.service';
 // import { AuthGuard } from 'src/guards/Auth.guard';
 
 @Module({

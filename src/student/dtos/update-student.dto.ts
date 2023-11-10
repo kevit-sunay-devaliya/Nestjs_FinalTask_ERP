@@ -4,7 +4,9 @@ import {
   IsOptional,
   IsNumber,
   IsPhoneNumber,
+  IsMongoId,
 } from 'class-validator';
+// import { Types } from 'mongoose';
 
 export class UpdateStudentDto {
   @IsString()
@@ -34,4 +36,9 @@ export class UpdateStudentDto {
   @IsNumber()
   @IsOptional()
   batchYear: number;
+
+  @IsMongoId()
+  @IsOptional()
+  // departmentId: Types.ObjectId;
+  departmentId: string;
 }

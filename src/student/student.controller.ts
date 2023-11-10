@@ -9,7 +9,9 @@ import {
   HttpStatus,
   UnauthorizedException,
   UseGuards,
-  Request,
+  // Request,
+  Req,
+  Res,
 } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { CreateStudentDto } from './dtos/create-student.dto';
@@ -19,21 +21,24 @@ import { HttpException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { config } from '../config';
-import { AuthGuard, ExtendedRequest } from '../guards/Auth.guard';
-import { StaffAuthorizationGuard } from 'src/guards/Authorization.guard';
-
+import { AuthGuard } from '../guards/Auth.guard';
+import { StaffAuthorizationGuard } from '../guards/Authorization.guard';
+import { Request } from 'express';
+import * as bcrypt from 'bcrypt';
+// import { Request } from 'express';
 @Controller('student')
 export class StudentController {
   constructor(
     private studentService: StudentService,
     private readonly jwtservice: JwtService,
+
     @InjectModel('Student') private readonly Student: Model<any>,
   ) {}
 
   @Post('/create')
   @UseGuards(AuthGuard, StaffAuthorizationGuard)
   createStudent(@Body() body: CreateStudentDto) {
+    // this.loggerService.logInfo('Student Created!');
     return this.studentService.create(body);
   }
 
@@ -43,50 +48,49 @@ export class StudentController {
   // }
 
   @Post('/login')
-  async login(@Body() body: Login_SignupStudentDto) {
-    const { email, password } = body;
-    const student: any = await this.Student.findOne({
-      email,
-    });
-    if (student) {
-      const match = password === student.password;
+  async login(@Body() body: Login_SignupStudentDto, @Res() res) {
+    try {
+      const { email, password } = body;
+      const student: any = await this.Student.findOne({
+        email,
+      });
+      if (student) {
+        const match = await bcrypt.compare(password, student.password);
+        if (match) {
+          const token = this.jwtservice.sign(
+            {
+              _id: student._id.toString(),
+              studentId: student.studentId,
+            },
+            { secret: process.env.PRIVATE_KEY },
+          );
 
-      if (match) {
-        const token = this.jwtservice.sign(
-          {
-            _id: student._id.toString(),
-            studentId: student.studentId,
-          },
-          { secret: config.private_key },
-        );
+          student.authToken = token;
+          await student.save();
 
-        student.authToken = token;
-        await student.save();
-
-        return { student, token };
+          return res.status(HttpStatus.OK).send(student);
+        }
       }
-
-      throw new HttpException('Invalid Credentials', HttpStatus.UNAUTHORIZED);
+    } catch (error) {
+      return res.status(HttpStatus.UNAUTHORIZED).send(error.message);
     }
-    throw new HttpException('Student not found', HttpStatus.NOT_FOUND);
   }
 
   @Post('/logout')
   @UseGuards(AuthGuard)
-  async logoutStudent(@Request() request: ExtendedRequest) {
+  async logoutStudent(@Req() request: Request, @Res() res) {
     try {
       const id = request['id'];
       const student = await this.Student.findById(id);
       if (!student) {
-        throw new UnauthorizedException('please Login!');
+        res.status(404).send('User not found');
+      } else {
+        res.send('logout Successful');
       }
       student.authToken = undefined;
       student.save();
     } catch (error) {
-      throw new HttpException(
-        'Internal server error!',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      return res.status(500).send('Server error');
     }
   }
 
@@ -98,7 +102,7 @@ export class StudentController {
 
   @Get('/profile')
   @UseGuards(AuthGuard)
-  async getStudent(@Request() request: ExtendedRequest) {
+  async getStudent(@Req() request: Request) {
     try {
       const id = request['id'];
       const student = await this.studentService.findStudent(id);
@@ -133,6 +137,60 @@ export class StudentController {
   deleteStudent(@Param('id') id: string) {
     try {
       return this.studentService.delete(id);
+    } catch (error) {
+      throw new HttpException(
+        'Internal server error!',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('/getBatchDepartmentWiseStudents')
+  @UseGuards(AuthGuard, StaffAuthorizationGuard)
+  getBatchDepartmentWiseData() {
+    try {
+      return this.studentService.getBatchDepartmentWiseData();
+    } catch (error) {
+      throw new HttpException(
+        'Internal server error!',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Post('/getAbsentStudents')
+  @UseGuards(AuthGuard, StaffAuthorizationGuard)
+  getAbsentStudentBatchYearSemesterDateWise(@Req() request: Request) {
+    try {
+      return this.studentService.getAbsentStudentBatchYearSemesterDateWise(
+        request.body,
+      );
+    } catch (error) {
+      throw new HttpException(
+        'Internal server error!',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Post('/getMoreThen75PercentAttendanceStudent')
+  @UseGuards(AuthGuard, StaffAuthorizationGuard)
+  getMoreThen75PercentStudent(@Req() request: Request) {
+    try {
+      return this.studentService.getMoreThen75PercentStudent(request.body);
+    } catch (error) {
+      throw new HttpException(
+        'Internal server error!',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Post('/getVacancySeat')
+  @UseGuards(AuthGuard, StaffAuthorizationGuard)
+  getVacancySeat(@Req() request: Request) {
+    try {
+      return this.studentService.getVacancySeat(request.body);
     } catch (error) {
       throw new HttpException(
         'Internal server error!',

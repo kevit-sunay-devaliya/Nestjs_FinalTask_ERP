@@ -7,8 +7,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 // import { Faculty } from 'src/faculty/faculty.schema';
 // import { AuthMiddleware } from 'src/middlewares/auth.middleware';
 import { JwtService } from '@nestjs/jwt';
-import { FacultyService } from 'src/faculty/faculty.service';
-import { Faculty, FacultySchema } from 'src/faculty/faculty.schema';
+import { FacultyService } from '../faculty/faculty.service';
+import { Faculty, FacultySchema } from '../faculty/faculty.schema';
+import { Logger } from 'winston';
 // import { FacultyService } from 'src/faculty/faculty.service';
 
 @Module({
@@ -17,7 +18,7 @@ import { Faculty, FacultySchema } from 'src/faculty/faculty.schema';
     MongooseModule.forFeature([{ name: Faculty.name, schema: FacultySchema }]),
   ],
   controllers: [StudentController],
-  providers: [StudentService, JwtService, FacultyService],
+  providers: [StudentService, JwtService, FacultyService, Logger],
   exports: [StudentService],
 })
 export class StudentModule {

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 // import { AttendanceDto } from './dtos/attendance.dto';
-import { Student } from 'src/student/student.schema';
+import { Student } from '../student/student.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
