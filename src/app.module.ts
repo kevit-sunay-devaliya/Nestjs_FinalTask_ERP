@@ -2,14 +2,13 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { StudentModule } from './student/student.module';
-import { FacultyModule } from './faculty/faculty.module';
-import { DepartmentModule } from './department/department.module';
-import { AttendanceModule } from './attendance/attendance.module';
+import { StudentModule } from './components/student/student.module';
+import { FacultyModule } from './components/faculty/faculty.module';
+import { DepartmentModule } from './components/department/department.module';
+import { AttendanceModule } from './components/attendance/attendance.module';
 import { MiddlewareConsumer } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
-// import { AuthGuard } from './guards/Auth.guard';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cookieSession = require('cookie-session');
 @Module({
