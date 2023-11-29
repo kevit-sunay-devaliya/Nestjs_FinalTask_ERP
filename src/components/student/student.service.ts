@@ -25,9 +25,6 @@ export class StudentService {
   async findStudent(id: string) {
     try {
       const student = await this.studentModel.findById(id);
-      if (!student) {
-        throw new NotFoundException('NOT FOUND!');
-      }
       return student;
     } catch (error) {
       throw new NotFoundException('NOT FOUND!');
